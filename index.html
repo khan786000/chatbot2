@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple AI Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f2f2f7;
+        }
+        .chat-container {
+            width: 500px;
+            background: #def3f0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .chat-box {
+            width: 100%;
+            height: 400px;
+            overflow-y: auto;
+            border: 5px solid #0e0d0d;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        #user-input {
+            width: calc(100% - 100px);
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #050505;
+            border-radius: 8px;
+        }
+        #send-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        #send-btn:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div id="chat-box" class="chat-box"></div>
+        <input type="text" id="user-input" placeholder="Type your message here...">
+        <button id="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+    <script>
+        function sendMessage() {
+            const userInput = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            const message = userInput.value;
+
+            if (message.trim() === "") return;
+
+            // Display user's message
+            const userMessage = document.createElement('div');
+            userMessage.classList.add('message');
+            userMessage.textContent = "You: " + message;
+            chatBox.appendChild(userMessage);
+
+            // Clear the input field
+            userInput.value = "";
+
+            // Send the message to the backend
+            fetch('http://localhost:8080/chatbot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const aiMessage = document.createElement('div');
+                aiMessage.classList.add('message');
+                aiMessage.textContent = "Nexa: " + data.response;
+                chatBox.appendChild(aiMessage);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
